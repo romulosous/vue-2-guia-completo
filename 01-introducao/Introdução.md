@@ -1,4 +1,4 @@
-## Primeira APP em VueJS
+# 🤯 Primeira APP em VueJS
 
 ## Forma rapida de usar o vuejs
 
