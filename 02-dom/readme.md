@@ -14,7 +14,7 @@
 
 
 #
-## 2-Entendendo VueJS Templates
+## Entendendo VueJS Templates
 * A instancia do vue é o intermediario entre a template(o que voce escreveu) e aquilo que será jogado no browser
 
 ~~~html
@@ -43,7 +43,7 @@
 
 
 #
-## 3-Sintaxe de Template e Instancia VueJS Trabalhando Juntos
+## Sintaxe de Template e Instancia VueJS Trabalhando Juntos
 
 * Vue cria acessso diretos quando voce trabalha, por exemplo, dentro do template
 
@@ -55,7 +55,7 @@
   
 
 #
-## 4-Acessando Dados na Instância VueJS
+## Acessando Dados na Instância VueJS
 
 * Na template o acesso é direto, mas dentro da instancia do vue o acesso é com o `this`
 
@@ -79,11 +79,11 @@
 * Logo acima, o dado **titulo** vai fazer o proxy
 * Apartir de saudacao eu consigo acessar o titulo
 * this representa a instancia do Vue
-* Nao pode ter uma função e um dado com o mesmo nome
+* Importante: **Nao pode ter uma função e um dado com o mesmo nome**
 
 
 #
-## 5-Binding de Atributos
+## Binding de Atributos
 
 * Para propriedades dentro das tags, usar diretivas
 
@@ -95,20 +95,30 @@
   * É a nomeclatura que o Vue usa, que sao propriedades personalizadas interpretadas pelo Vue.
 
 #
-## 7- Evitando Re-Renderização
-* v-once
+## Evitando Re-Renderização
+* **v-once** impedir que os dados sejam reativo
+  * é diferente do modificador `once`, que modifica o comportamento de uma diretiva
 
 #
-## 8- Como Imprimir HTML Puro
-* atravez da diretiva v-html
+## Diretiva V-HTML (Imprimir HTML Puro)
+  * Com essa diretiva, posso passar codigo HTML atráves de um atributo no Vue
+  * Converter string para HTML Verdadeiro
+
 * Só que deve tomar muito cuidado ao aceitar scripts assim diretamente!
-  * xss Attack
+  * XSS Attack
 
 
 #
-## 11- Escutando Eventos
-* v-on <- diretiva que intercepta os eventos...."quando um evento acontecer"
-  * significa que voce vai chamar uma funcao
+## Escutando Eventos
+* v-on <- diretiva que intercepta os eventos
+  * "quando um evento acontecer:"
+    * significa que voce vai chamar uma funcao
+
+<br/>
+
+### **v-on:mousemove** 
+  * Ao passar o mouse em cima da tag **< p>**, é mostrado a posição do mouse.
+
 
 ```html
 <p v-on:mousemove="atualizarXY">Mouse: {{x}} e {{y}}</p>
@@ -130,17 +140,39 @@
     }
   })
 ```
+<br/>
 
-*Mesmo que eu não passe o  `event` lá em cima, ele sempre é passado por padrão*
+### **v-on:click**
+* Ao ser clicado o elemento dispara uma função.
 
-* não tem haver diretamente com o Vue... é um evento gerado pelo Javascript
+ ```html
+ <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 
-* Voce pode ignorar o evento
+<div id="app">
+    <p>{{ contador }}</p>
+    <button v-on:click="somar">Somar 1</button>
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            contador: 0
+        },
+        methods: {
+            somar(){
+                this.contador++
+            }
+        }
+    })
+</script>
+
+ ```
 
 #
 ## Passando nossos proprios argumentos com Eventos
 
-* No momento que passamos nossos proprios parametros especifico, automaticamente o event não é passado por padrao
+* Por padrão o Vue já reconhece o parâmetro Vue, ou seja, mesmo que eu não passe ele na função, eu consigo usar ele. Não tem haver diretamente com o Vue, é um evento gerado pelo javascript. No entando, no momento que passamos nossos proprios parametros especifico, automaticamente o **event** não será mais passado por padrão
 
 ```html
 <button v-on:click="somar(5)">somar +1</button>
@@ -162,7 +194,7 @@
 </script>
 ```
 
-* e si eu quisesse passar o event?
+* se eu passar outro parâmetro para a função e ainda sim quiser usar o evento, eu preciso usar o event assim $event com dólar na frente e o nome obrigatoriamente precisa ser event.
   * palavra especial reservada: `$event`
     * o evento que foi gerado vai ser passado como parametro para a função
     
@@ -178,6 +210,8 @@
 
 #
 ##  14- Modificadores de Eventos
+
+* Parar quando eu passar por cima da tag `span`
 
 ```html
 <p v-on:mousemove="atualizarXY">Mouse: {{x}} e {{y}}
@@ -218,6 +252,11 @@
   <span v-on:mousemove.stop.prevent="">PARAR AQUI!!!</span>
 ```
 
+* Fazer o binding apenas quando sair do campo
+  `v-model.lazy`
+
+* `v-model.number`, `v-model.trim`....
+
 
 * outros modificadores de eventos: [documentação](https://vuejs.org/v2/guide/events.html#Event-Modifiers)
 
@@ -225,8 +264,47 @@
 #
 ## Eventos de Teclado
 
+* Fica muito mais fácil controlar quais teclas o usuário digitou, basta passar o nome da tecla `v-on:keyup.(nome da tecla)`. Para controlar duas teclas pressionadas juntas `v-on:keyp.(nomedatecla).(nomedatecla)`
+
 ```html
-<input v-on:keyup.enter.alt="exibirAlerta" type="text">
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+<div id="app">
+    <div>
+        <label>Ativa após qualquer tecla:</label>
+        <input type="text" v-on:keyup="solteiTecla">
+    </div>
+
+    <div>
+        <label>Ativa após o enter:</label>
+        <input type="text" v-on:keyup.enter="solteiEnter">
+    </div>
+
+    <div>
+        <label>Ativa após o enter + alt:</label>
+        <input type="text"  v-on:keyup.enter.alt="solteiEnter_Alt">
+    </div>
+    
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        methods: {  
+            solteiTecla(){
+                alert('apertei qualquer tecla')
+            },
+
+            solteiEnter(){
+                alert('Apertei Enter')
+            },
+
+            solteiEnter_Alt(){
+                alert('Apertei enter+alt')
+            }
+        }
+    })
+</script>
 ```
 * [key Modifiers](https://vuejs.org/v2/guide/events.html#Key-Modifiers)
 
@@ -242,12 +320,19 @@
 #
 ## Usando Two-Way-Binding
 
+Por enquanto com v-bind os dados da minha instância Vue modificam apenas o template.
+
+Já os eventos ouvem no template e modificam apenas os dados da instância Vue que por sua vez modificam o template.
+
+Agora o v-model vai modificar ao mesmo tempo o template e os dados da minha instância Vue, funcionando como um espelho ou uma via de mão dupla.
+
 
 
 * Vue instance X Vue da camada de visão
 * Framework Vue alterando HTML
 
 * Two way binding utilizando `v-bind:` + `v-on:`
+  * associação de dados bidirecional
 ```html
 <div id="app">
   <p>{{titulo}}</p>
@@ -277,6 +362,60 @@
 ## Propriedades Computadas
 
 * Diferença entre usar uma Computed propety X Methods ?
+
+Quando existe alguma alteração na irteface os componentes são rendererizados novamente, então os métodos são invocados mesmo sem ter ligação com as propriedades alteradas. Existe uma propriedade no vue chamada computed que o método só vai ser invocado quando a propriedade que tem relação com ele é alterada.
+
+Propriedades computed são chamadas sem os pareteses ()
+
+Repare que sem o computed, o método resultado() era chamado quando clicado em aumentar2, mesmo sem aumentar2 ter relação nenhuma com o método resultado, com o computed uma propriedade computada será apenas invocada quando uma propriedade que está relacionada a ela é atualizada!
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+<div id="app">
+    <button v-on:click="aumentar">Aumentar</button>
+    <button v-on:click="contador2++">Aumentar2</button>
+    <button v-on:click="diminuir">Diminuir</button>
+    <p>Contador: {{ contador1 }} | {{ contador2 }}</p>
+    <p>Resultado: {{ resultado }}</p>
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            contador1: 0,
+            contador2: 0
+        },
+
+        computed: {
+            resultado(){
+                console.log("É chamado apenas quando modifico contador1")
+                return this.contador1 >= 5 ? 
+                       "maior ou igual a 5" : "menor que 5"         
+            }
+        },
+
+        methods: {
+             aumentar(){
+                this.contador1++        
+            },
+             diminuir(){
+                this.contador1--           
+            },
+            /* 
+            resultado(){
+                console.log(É chamado quando modifico contador 2, mesmo sem ter relação)
+                return this.contador >= 5 ? 
+                       "maior ou igual a 5" : "menor que 5"         
+            } */
+        }
+    })
+</script>
+
+```
+
+O computed é usado quando quero juntar dois dados em um só.
 
 *  o motivo é que basicamente o Vue não sabe qual dos métodos precisa ser executado, dependendo do que foi atualizado. E esse é o tipo de operação que as propriedades calculadas fazem, elas observam as variáveis ​​que precisam ser calculadas ou recalculadas e só são executadas quando necessário.
 
@@ -343,6 +482,9 @@ contador(novo, antigo) {
 #
 ## Sintaxe Reduzida (Shorthands)
 
+* **v-on** por **@**
+* **v-bind** por **:(dois pontos)**
+
 *Antes:*
 ```html
 <div id="app">
@@ -365,20 +507,23 @@ contador(novo, antigo) {
 
 #
 ## Estilo Dinâmico e Classe CSS
-
+### 1 - Consigo aplicar estilo css diretamente no template usando:
 ```html
- <div class="demo" :class="{'nome-da-classe' : boolean}"></div>
+ <div class="demo" :class="{'nome-da-classe' : valorBoolean}"></div>
 ```
-* vai acrescentar dentro de classe, aquilo que estiver fazendo o biding
+* vai acrescentar dentro de classe, aquilo que estiver fazendo o binding
 
-* obs: Colocar entre aspas, caso o nome ferir os nomes validos dos identificadores do javascript 
+* obs: Colocar entre aspas, caso o nome ferir os nomes válidos dos identificadores do javascript 
 
 * example:
 ```html
- <div class="demo" :class="{c1 : aplicarC1}"></div>
+ <div class="demo" :class="{'color-red' : aplicarC1}"></div>
 ```
 
-* Deixando a template mais enchuta com computed propety:
+<br>
+<br>
+
+### 2- Deixando a template mais enchuta com computed propety:
 
 ```html
 <div id="app">
@@ -406,10 +551,33 @@ contador(novo, antigo) {
 </script>
 ```
 
-* sintaxe de array para aplicar mais de uma classe
+<br>
+
+### sintaxe de array para aplicar mais de uma classe
 
 ```html
 <div class="demo" :class="[classeCSS, 'girar', {teste: true}]"></div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            aplicarC1: false,
+            classeCSS: "c1",
+            teste: "girar"
+        },
+
+        computed: {
+            estilo(){
+                return {
+                    c1: this.aplicarC1,
+                    c2: !this.aplicarC1
+                }
+            }
+        }
+    })
+</script>
+
 ```
 
 * nome do atributo é o mesmo nome da classe? pode colocar apenas uma vez 
@@ -435,3 +603,56 @@ new Vue({
 
 ```
 
+### Estilo dinâmico sem classe
+
+* Lembrando que para aplicar o nome de uma classe no template que tenha - (hífe) preciso usar aspas. ex: 'background-color'
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+<style>
+    .caixas{
+        display: flex;
+        justify-content: space-around;
+    }
+
+    .demo{
+        width: 100px;
+        height: 100px;
+        background-color: gray;
+    }
+
+</style>
+
+<div id="app">
+    <div class="caixas">
+        <div class="demo" :style="{'background-color' : cor}"></div>
+        <div class="demo" :style="[meuEstilo, {height: altura} ]"></div>
+        <div class="demo"></div>
+    </div>
+    <hr>
+    <input type="text" v-model="cor">
+    <input type="text" v-model="largura">
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+           cor: 'red',
+           largura : '300',
+           altura : 20
+        },
+
+        computed: {
+            meuEstilo(){
+                return{
+                    backGroundColor: this.cor,
+                    width : this.largura + 'px'
+                }
+            }  
+        }
+    })
+</script>
+
+```
